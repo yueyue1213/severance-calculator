@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>离职补偿金计算器</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff0f5;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #d63384;
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #ff69b4;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #d63384;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fdf7fb;
+      border: 1px solid #f6c5df;
+      border-radius: 8px;
+    }
+    .result h2 {
+      margin-top: 0;
+      font-size: 20px;
+      color: #d63384;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>离职补偿金计算器</h1>
+    <label>过去12个月总薪资（元）</label>
+    <input type="number" id="salary" placeholder="例如：120000">
+    <label>未休年假天数（天）</label>
+    <input type="number" id="leaveDays" placeholder="例如：3">
+    <label>工作年限（年）</label>
+    <input type="number" id="years" placeholder="例如：2">
+    <label>工作月份（不足一年）（月）</label>
+    <input type="number" id="months" placeholder="例如：5">
+    <label>赔偿方式</label>
+    <select id="method">
+      <option value="n">N（补偿金）</option>
+      <option value="n+1">N+1（额外1个月工资）</option>
+      <option value="2n">2N（双倍赔偿）</option>
+    </select>
+    <button onclick="calculate()">计算补偿金</button>
+    <div id="result" class="result" style="display:none;"></div>
+  </div>
+  <script>
+    function calculate() {
+      const salary = parseFloat(document.getElementById('salary').value) || 0;
+      const leaveDays = parseFloat(document.getElementById('leaveDays').value) || 0;
+      const years = parseFloat(document.getElementById('years').value) || 0;
+      const months = parseFloat(document.getElementById('months').value) || 0;
+      const method = document.getElementById('method').value;
+
+      const avgSalary = salary / 12;
+      const service = years + (months >= 6 ? 1 : (months > 0 ? 0.5 : 0));
+      let baseComp = service * avgSalary;
+
+      if (method === "n+1") baseComp += avgSalary;
+      if (method === "2n") baseComp *= 2;
+
+      const leaveComp = (leaveDays / 21.75) * avgSalary;
+      const total = baseComp + leaveComp;
+
+      document.getElementById('result').style.display = "block";
+      document.getElementById('result').innerHTML = `
+        <h2>计算结果</h2>
+        <p>平均月薪：${avgSalary.toFixed(2)} 元</p>
+        <p>折算工龄：${service} 年</p>
+        <p>补偿方式：${method.toUpperCase()}</p>
+        <p>补偿金：${baseComp.toFixed(2)} 元</p>
+        <p>未休年假折算：${leaveComp.toFixed(2)} 元</p>
+        <hr>
+        <p><b>合计应得：${total.toFixed(2)} 元</b></p>
+      `;
+    }
+  </script>
+</body>
+</html>
